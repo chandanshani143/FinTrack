@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider    = "postgresql"
+  url         = env("DATABASE_URL")
+  directUrl   = env("DIRECT_URL")
+}
+
+model User {
+  id  String @id @default(cuid())
+  clerkUserId String @unique     //clerk user id
+  email String
+  name String?
+  imageUrl String?                // ? means optional
+  transactions Transaction[]
+  accounts Account[]
+  budgets Budget[]
+  createdAT DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")          //in the database, we'll call this model as users table
+}
+
+model Account {
+  id String @id @default(uuid())
+  name String
+  type AccountType                     //this is a enum that can have some specific values
+  balance Decimal @default(0)         // will ask initial balance while creating an account
+  isDefault Boolean @default(false)    //only one account can be a default account
+  userId String                        //foreign key to user table
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)    //if user deleted all their accounts will be deleted
+  transactions Transaction[]
+  createdAT DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])    //index to make search faster
+  @@map("accounts")    //in the database, we'll call this model as accounts table
+}
+
+enum AccountType {
+  CURRENT
+  SAVINGS
+}
+
+model Transaction {
+  id String @id @default(uuid())
+  type TransactionType
+  amount Decimal
+  description String?
+  date DateTime
+  category String
+  receiptUrl String?
+  isRecurring Boolean @default(false)
+  recurringInterval RecurringInterval?     // only used if isRecurring is true
+  nextRecurringDate DateTime?               // next date for recurring transaction
+  lastProcessedDate DateTime?               // last time this recurring transaction was processed
+  status TransactionStatus @default(COMPLETE)
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId String
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAT DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])    //index to make search faster
+  @@index([accountId])    //index to make search faster
+  @@map("transactions")    //in the database, we'll call this model as transactions table
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum RecurringInterval {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum TransactionStatus {
+  COMPLETE
+  PENDING
+  FAILED
+}
+
+model Budget {
+  id String @id @default(uuid())
+  amount Decimal
+  lastAlertSent DateTime?       //Tracck when the last alert was sent
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAT DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])    //index to make search faster
+  @@map("budgets")
+}
