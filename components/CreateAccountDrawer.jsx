@@ -111,7 +111,7 @@ const CreateAccountDrawer = ({ children }) => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="CURRENT">Current</SelectItem>
-                                    <SelectItem value="SAVING">Saving</SelectItem>
+                                    <SelectItem value="SAVINGS">Savings</SelectItem>
                                 </SelectContent>
                             </Select>
                             {errors.type && (
