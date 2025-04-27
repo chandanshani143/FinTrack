@@ -8,7 +8,7 @@ CREATE TYPE "TransactionType" AS ENUM ('INCOME', 'EXPENSE');
 CREATE TYPE "RecurringInterval" AS ENUM ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY');
 
 -- CreateEnum
-CREATE TYPE "TransactionStatus" AS ENUM ('COMPLETE', 'PENDING', 'FAILED');
+CREATE TYPE "TransactionStatus" AS ENUM ('COMPLETED', 'PENDING', 'FAILED');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -17,7 +17,7 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "name" TEXT,
     "imageUrl" TEXT,
-    "createdAT" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
@@ -31,7 +31,7 @@ CREATE TABLE "accounts" (
     "balance" DECIMAL(65,30) NOT NULL DEFAULT 0,
     "isDefault" BOOLEAN NOT NULL DEFAULT false,
     "userId" TEXT NOT NULL,
-    "createdAT" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
@@ -50,10 +50,10 @@ CREATE TABLE "transactions" (
     "recurringInterval" "RecurringInterval",
     "nextRecurringDate" TIMESTAMP(3),
     "lastProcessedDate" TIMESTAMP(3),
-    "status" "TransactionStatus" NOT NULL DEFAULT 'COMPLETE',
+    "status" "TransactionStatus" NOT NULL DEFAULT 'COMPLETED',
     "userId" TEXT NOT NULL,
     "accountId" TEXT NOT NULL,
-    "createdAT" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "transactions_pkey" PRIMARY KEY ("id")
@@ -65,7 +65,7 @@ CREATE TABLE "budgets" (
     "amount" DECIMAL(65,30) NOT NULL,
     "lastAlertSent" TIMESTAMP(3),
     "userId" TEXT NOT NULL,
-    "createdAT" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "budgets_pkey" PRIMARY KEY ("id")

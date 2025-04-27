@@ -23,7 +23,7 @@ model User {
   transactions Transaction[]
   accounts Account[]
   budgets Budget[]
-  createdAT DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")          //in the database, we'll call this model as users table
@@ -38,7 +38,7 @@ model Account {
   userId String                        //foreign key to user table
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)    //if user deleted all their accounts will be deleted
   transactions Transaction[]
-  createdAT DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])    //index to make search faster
@@ -62,12 +62,12 @@ model Transaction {
   recurringInterval RecurringInterval?     // only used if isRecurring is true
   nextRecurringDate DateTime?               // next date for recurring transaction
   lastProcessedDate DateTime?               // last time this recurring transaction was processed
-  status TransactionStatus @default(COMPLETE)
+  status TransactionStatus @default(COMPLETED)
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   accountId String
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  createdAT DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])    //index to make search faster
@@ -88,7 +88,7 @@ enum RecurringInterval {
 }
 
 enum TransactionStatus {
-  COMPLETE
+  COMPLETED
   PENDING
   FAILED
 }
@@ -99,7 +99,7 @@ model Budget {
   lastAlertSent DateTime?       //Tracck when the last alert was sent
   userId String @unique
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAT DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])    //index to make search faster

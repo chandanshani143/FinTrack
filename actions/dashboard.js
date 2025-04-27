@@ -34,7 +34,7 @@ export async function getUserAccounts() {
     try {
         const accounts = await db.account.findMany({
           where: { userId: user.id },
-          orderBy: { createdAT: "desc" },
+          orderBy: { createdAt: "desc" },
           include: {
             _count: {
               select: {
@@ -79,10 +79,12 @@ export async function createAccount(data) {
             where: { userId: user.id },
         });
 
+        // If it's the first account, make it default regardless of user input
+        // If not, use the user's preference 
         const shouldBeDafault = 
-        existingAccount.lenght===0 ? true : data.isDefault;
+        existingAccount.length === 0 ? true : data.isDefault;
 
-        //If this account should be default, unset other default accounts
+        // If this account should be default, unset other default accounts
         if (shouldBeDafault) {
             await db.account.updateMany({
                 where: { userId: user.id, isDefault: true },
