@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 💼 FinTrack – AI-Powered Finance Management Platform
+
+I designed and developed **FinTrack**, an **AI-powered finance management platform** that helps users track and manage their income and expenses across multiple accounts with an intuitive web interface.
+
+<p align="center">
+  <img src="public/fintrack_screenshot.png" alt="FinTrack Dashboard Preview" width="100%" />
+</p>
+
+---
+
+## 🚀 Features
+
+- 💡 **AI-based Receipt Scanning**  
+  Automatically extracts transaction details from uploaded receipts using OCR (Optical Character Recognition).
+
+- 🧠 **Smart Transaction Categorization**  
+  Categorizes transactions using rule-based logic and NLP (Natural Language Processing).
+
+- 🔁 **Recurring Transaction Setup**  
+  Schedule and manage regular payments like subscriptions, salaries, or bills.
+
+- 📧 **Automated Email Alerts**  
+  Notifies users about upcoming bills, low balances, and irregular financial activity.
+
+- 📊 **Visual Budgeting Insights**  
+  Offers clean summaries and visual analytics like pie-chart, Bar-graph to help improve financial planning.
+
+- 🔒 **Multi-Account Support**  
+  Manage personal, current, or saving effortlessly.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Next.js, Tailwind CSS  
+- **Backend:** Prisma, Supabase (PostgreSQL)  
+- **Authentication:** Clerk  
+- **AI Services:** OCR & NLP APIs for receipt processing and smart categorization  
+
+---
+
+## 🧠 About this project
+
+This project reflects my interest in building intelligent, user-focused applications that solve real-world problems through automation and design FinTrack combines powerful AI integrations with modern full-stack technologies to deliver a seamless personal finance experience.
+
+## 📬 Contact
+
+Feel free to connect with me on LinkedIn or explore my other projects!
+
 
 ## Getting Started
 
-First, run the development server:
+### Installation
 
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/FinTrack.git
+cd fintrack
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies for both frontend and backend:
+```bash
+# Install dependencies
+npm install
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Set up environment variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit the `.env` file with your API keys and configuration:
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_key_here
+CLERK_SECRET_KEY=your_key_here
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=sign-up
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+# Connect to Supabase via connection pooling with Supavisor.
+DATABASE_URL=your_url_here
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Direct connection to the database. Used for migrations.
+DIRECT_URL=your_url_here
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+ARCJET_KEY=your_key_here
 
-## Deploy on Vercel
+### Running the Application
+Start the dev server:
+```bash
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open your browser and navigate to `http://localhost:3000`

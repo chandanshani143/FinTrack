@@ -51,7 +51,7 @@ const HeroSection = () => {
       <div className="hero-image-wrapper">
         <div ref={imageRef} className="hero-image">
           <Image
-            src="/background_banner.jpeg"
+            src="/background_banner2.png"
             width={1280}
             height={720}
             alt="Dashboard Preview"
