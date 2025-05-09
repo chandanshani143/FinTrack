@@ -58,9 +58,8 @@ git clone https://github.com/yourusername/FinTrack.git
 cd fintrack
 ```
 
-2. Install dependencies for both frontend and backend:
+2. Install dependencies:
 ```bash
-# Install dependencies
 npm install
 
 3. Set up environment variables:
@@ -68,15 +67,17 @@ npm install
 Edit the `.env` file with your API keys and configuration:
 ```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_key_here
+
 CLERK_SECRET_KEY=your_key_here
+
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=sign-in
+
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=sign-up
 
-
-# Connect to Supabase via connection pooling with Supavisor.
+<!-- Connect to Supabase via connection pooling with Supavisor. -->
 DATABASE_URL=your_url_here
 
-# Direct connection to the database. Used for migrations.
+<!-- Direct connection to the database. Used for migrations. -->
 DIRECT_URL=your_url_here
 
 ARCJET_KEY=your_key_here
