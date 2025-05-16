@@ -1,6 +1,6 @@
 import { serve } from "inngest/next";
-import { inngest } from "../../lib/inngest/client";
-import { checkBudgetAlerts} from "../../lib/inngest/function";
+import { inngest } from "@/lib/inngest/client";
+import { checkBudgetAlerts} from "@/lib/inngest/function";
 
 
 // Create an API that serves zero functions
