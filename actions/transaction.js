@@ -1,12 +1,15 @@
 "use server";
+
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import aj from "@/lib/arcjet";
+import { request } from "@arcjet/next";
 
 
 const serializeAmount = (obj) => ({
-  ...obj,
-  amount: obj.amount.toNumber(),
+    ...obj,
+    amount: obj.amount.toNumber(),
 });
 
 //create Transaction
@@ -16,6 +19,28 @@ export async function createTransaction(data) {
         if (!userId) throw new Error("Unauthorized");
 
         // Get request data for ArcJet
+        const req = await request();
+
+        //check rate limit
+        const decision = await aj.protect(req, {
+            userId,       //we are tracking based on userId
+            requested: 1, // specify how many token each request consumes
+        });
+
+        if (decision.isDenied()) {
+            if (decision.reason.isRateLimit()) {
+                const { remaining, reset } = decision.reason;
+                console.error({
+                    code: "RATE_LIMIT_EXCEEDED",
+                    details: {
+                        remaining,
+                        resetInSeconds: reset,
+                    },
+                });
+                throw new Error("Too many requests. Please try again later.");
+            }
+            throw new Error("Request blocked.");
+        }
 
         const user = await db.user.findUnique({
             where: { clerkUserId: userId },
