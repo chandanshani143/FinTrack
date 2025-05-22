@@ -29,6 +29,7 @@ import CreateAccountDrawer from "@/components/CreateAccountDrawer";
 import { cn } from "@/lib/utils";
 import { createTransaction } from "@/actions/transaction";
 import { transactionSchema } from "@/app/lib/schema";
+import ReceiptScanner from "./receipt-scanner";
 
 const AddTransactionForm = ({ accounts, categories }) => {
   const router = useRouter();
@@ -69,6 +70,21 @@ const AddTransactionForm = ({ accounts, categories }) => {
     transactionFn(formData);
   };
 
+  //function to handle the scanned data from receipt scanner component
+  const handleScanComplete = (scannedData) => {
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
+      toast.success("Receipt scanned successfully");
+    }
+  };
+
   useEffect(() => {
     if (transactionResult?.success && !transactionLoading) {
       toast.success("Transaction created successfully");
@@ -90,6 +106,10 @@ const AddTransactionForm = ({ accounts, categories }) => {
 
   return (
   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+    {/* AI Receipt Scanner */}
+    <ReceiptScanner onScanComplete={handleScanComplete} />
+
     {/* Type */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Type</label>
