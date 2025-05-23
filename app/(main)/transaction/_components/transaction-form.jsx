@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import { toast } from "sonner";
 
@@ -27,11 +27,17 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import CreateAccountDrawer from "@/components/CreateAccountDrawer";
 import { cn } from "@/lib/utils";
-import { createTransaction } from "@/actions/transaction";
+import { createTransaction, updateTransaction } from "@/actions/transaction";
 import { transactionSchema } from "@/app/lib/schema";
 import ReceiptScanner from "./receipt-scanner";
 
-const AddTransactionForm = ({ accounts, categories }) => {
+const AddTransactionForm = ({
+  accounts,
+  categories,
+  editMode = false,
+  editId = null, // Add editId prop
+  initialData = null,
+}) => {
   const router = useRouter();
 
   const {
@@ -44,21 +50,35 @@ const AddTransactionForm = ({ accounts, categories }) => {
     reset,
   } = useForm({
     resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      type: "EXPENSE",
-      amount: "",
-      description: "",
-      accountId: accounts.find((ac) => ac.isDefault)?.id,
-      date: new Date(),
-      isRecurring: false,
-    },
+    defaultValues:
+      editMode && initialData
+        ? {
+            type: initialData.type,
+            amount: initialData.amount.toString(),
+            description: initialData.description,
+            accountId: initialData.accountId,
+            category: initialData.category,
+            date: new Date(initialData.date),
+            isRecurring: initialData.isRecurring,
+            ...(initialData.recurringInterval && {
+              recurringInterval: initialData.recurringInterval,
+            }),
+          }
+        : {
+            type: "EXPENSE",
+            amount: "",
+            description: "",
+            accountId: accounts.find((ac) => ac.isDefault)?.id,
+            date: new Date(),
+            isRecurring: false,
+          },
   });
 
   const {
     loading: transactionLoading,
     fn: transactionFn,
     data: transactionResult,
-  } = useFetch(createTransaction);
+  } = useFetch(editMode ? updateTransaction : createTransaction);
 
   const onSubmit = (data) => {
     const formData = {
@@ -67,7 +87,11 @@ const AddTransactionForm = ({ accounts, categories }) => {
     };
 
     //sending for data to server action
-    transactionFn(formData);
+    if (editMode) {
+      transactionFn(editId, formData); // Now using editId from props
+    } else {
+      transactionFn(formData);
+    }
   };
 
   //function to handle the scanned data from receipt scanner component
@@ -87,17 +111,20 @@ const AddTransactionForm = ({ accounts, categories }) => {
 
   useEffect(() => {
     if (transactionResult?.success && !transactionLoading) {
-      toast.success("Transaction created successfully");
+      toast.success(
+        editMode
+          ? "Transaction updated successfully"
+          : "Transaction created successfully"
+      );
       reset();
       router.push(`/account/${transactionResult.data.accountId}`); //re-directing to account page
     }
-  }, [transactionResult, transactionLoading]);
+  }, [transactionResult, transactionLoading, editMode]);
 
   //watching to get the current form values in real-time as the user interact with form without waiting for form submission
   const type = watch("type");
   const isRecurring = watch("isRecurring");
   const date = watch("date");
-
 
   //filtering categories so that on income or expense type specific categories are shown
   const filteredCategories = categories.filter(
@@ -105,12 +132,11 @@ const AddTransactionForm = ({ accounts, categories }) => {
   );
 
   return (
-  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
-    {/* AI Receipt Scanner */}
-    <ReceiptScanner onScanComplete={handleScanComplete} />
-
-    {/* Type */}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* AI Receipt Scanner */}
+      {!editMode && <ReceiptScanner onScanComplete={handleScanComplete} />}{" "}
+      {/* only show in add mode */}
+      {/* Type */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Type</label>
         <Select
@@ -129,7 +155,6 @@ const AddTransactionForm = ({ accounts, categories }) => {
           <p className="text-sm text-red-500">{errors.type.message}</p>
         )}
       </div>
-
       {/* Amount and Account */}
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
@@ -144,7 +169,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
             <p className="text-sm text-red-500">{errors.amount.message}</p>
           )}
         </div>
-      <div className="space-y-2">
+        <div className="space-y-2">
           <label className="text-sm font-medium">Account</label>
           <Select
             onValueChange={(value) => setValue("accountId", value)}
@@ -174,7 +199,6 @@ const AddTransactionForm = ({ accounts, categories }) => {
           )}
         </div>
       </div>
-
       {/* Category */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Category</label>
@@ -197,7 +221,6 @@ const AddTransactionForm = ({ accounts, categories }) => {
           <p className="text-sm text-red-500">{errors.category.message}</p>
         )}
       </div>
-
       {/* Date */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Date</label>
@@ -230,7 +253,6 @@ const AddTransactionForm = ({ accounts, categories }) => {
           <p className="text-sm text-red-500">{errors.date.message}</p>
         )}
       </div>
-
       {/* Description */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Description</label>
@@ -239,7 +261,6 @@ const AddTransactionForm = ({ accounts, categories }) => {
           <p className="text-sm text-red-500">{errors.description.message}</p>
         )}
       </div>
-
       {/* Recurring Toggle */}
       <div className="flex flex-row items-center justify-between rounded-lg border p-4">
         <div className="space-y-0.5">
@@ -253,8 +274,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
           onCheckedChange={(checked) => setValue("isRecurring", checked)}
         />
       </div>
-
-       {/* Recurring Interval */}
+      {/* Recurring Interval */}
       {isRecurring && (
         <div className="space-y-2">
           <label className="text-sm font-medium">Recurring Interval</label>
@@ -279,7 +299,6 @@ const AddTransactionForm = ({ accounts, categories }) => {
           )}
         </div>
       )}
-
       {/* Actions */}
       <div className="flex gap-4">
         <Button
@@ -291,7 +310,16 @@ const AddTransactionForm = ({ accounts, categories }) => {
           Cancel
         </Button>
         <Button type="submit" className="w-full" disabled={transactionLoading}>
-          Create Transaction
+          {transactionLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {editMode ? "Updating..." : "Creating..."}
+            </>
+          ) : editMode ? (
+            "Update Transaction"
+          ) : (
+            "Create Transaction"
+          )}
         </Button>
       </div>
     </form>
