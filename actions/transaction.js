@@ -164,7 +164,7 @@ export async function scanReceipt(file) {
             prompt,
         ]);
 
-        const response = await result.response;
+        const response = result.response;
         const text = response.text();          // Extract text response
         const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();  // Remove ```json or ``` if present
 
