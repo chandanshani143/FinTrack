@@ -1,14 +1,19 @@
 import CreateAccountDrawer from '@/components/CreateAccountDrawer';
-import React from 'react'
+import { Suspense } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
-import { getUserAccounts } from '@/actions/dashboard';
+import { getUserAccounts, getDashboardData } from '@/actions/dashboard';
 import AccountCard from './_components/account-card.jsx';
 import { BudgetProgress } from './_components/budget-progress.jsx';
 import { getCurrentBudget } from '@/actions/budget.js';
+import { DashboardOverview } from './_components/transaction-overview.jsx';
 
 async function DashboardPage () {
-  const accounts = await getUserAccounts();
+  // Fetch accounts and transactions
+  const [accounts, transactions] = await Promise.all([
+    getUserAccounts(),
+    getDashboardData(),
+  ]);
 
   const defaultAccount = accounts?.find((account) => account.isDefault);
 
@@ -26,7 +31,11 @@ async function DashboardPage () {
         currentExpenses={budgetData?.currentExpenses || 0}
       />
 
-      {/* Overview */}
+      {/* DashboardOverview */}
+      <DashboardOverview
+        accounts={accounts}
+        transactions={transactions || []}
+      />
 
       {/* Account Grid */}
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
@@ -40,7 +49,7 @@ async function DashboardPage () {
             </CardContent>
           </Card>
         </CreateAccountDrawer>
- 
+
         {accounts.length > 0 &&
         accounts?.map((account) => {
           return <AccountCard key={account.id} account={account} />;
